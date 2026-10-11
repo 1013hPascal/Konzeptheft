@@ -1,0 +1,35 @@
+{
+  "format": "konzeptheft",
+  "version": 1,
+  "title": "Konzept",
+  "sections": [
+    {
+      "name": "Konzeptidee",
+      "text": "Jetzt einen text schreiben für die ide",
+      "children": [
+        {
+          "name": "unterpunkt idee",
+          "text": "",
+          "children": [
+            {
+              "name": "test",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "übersicht",
+      "text": ""
+    },
+    {
+      "name": "seite 0",
+      "text": ""
+    },
+    {
+      "name": "seite 1",
+      "text": ""
+    }
+  ]
+}
