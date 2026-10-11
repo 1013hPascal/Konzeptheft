@@ -6,6 +6,7 @@ die PDF und die Textdatei für andere Leser. Geöffnet werden .konzept und alte 
 """
 from __future__ import annotations
 
+import sys
 import os
 from pathlib import Path
 
@@ -17,13 +18,18 @@ from konzeptheft.core.project import SUFFIX, ProjectFormatError, from_json, to_j
 
 DATA_FOLDER_NAME = "Dateien"
 
+if getattr(sys, 'frozen', False):
+    base_dir = Path(sys.executable).parent
+else:
+    base_dir = Path(__file__).resolve().parent
 
 class StorageError(Exception):
     """Fehler beim Lesen oder Schreiben, mit einer Meldung für den Nutzer."""
 
 
-def data_folder(base: Path) -> Path:
+def data_folder(base_path: Path = None) -> Path:
     """Der Ordner "Dateien" neben dem Programm. Wird angelegt, wenn er fehlt."""
+    base = base_path or base_dir
     folder = base / DATA_FOLDER_NAME
     folder.mkdir(parents=True, exist_ok=True)
     return folder
