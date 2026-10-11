@@ -158,3 +158,52 @@ Ergebnis:
 Tasten: die .tex mit pdflatex oder TeXworks übersetzen.
 Erwartet: Keine Fehler. Inhaltsverzeichnis und Nummern wie im Konzeptheft.
 Ergebnis:
+
+## Rechtschreibung
+
+[ ] 30. Unterstreichen und Ton
+Tasten: im Textfeld „Ein Tset “ tippen (mit Leerzeichen am Ende).
+Erwartet: Nach dem Leerzeichen ein kurzer Ton. Sehende sehen eine rote Wellenlinie unter Tset.
+Ergebnis:
+
+[ ] 31. Ansage beim Lesen
+Tasten: Pfeil hoch, dann Pfeil runter auf die Zeile mit Tset. Dann Pos1 und Strg+Pfeil rechts.
+Erwartet: Nach dem Vorlesen der Zeile „Fehler: Tset“. Bei Strg+Pfeil auf Tset „Rechtschreibfehler“.
+Ergebnis:
+
+[ ] 32. Alt+R
+Tasten: Cursor auf Tset, Alt+R. Tab, Leertaste auf „Test“, Enter.
+Erwartet: Dialog, Fokus im Feld „Wort“ mit Tset. Tab führt zu „Vorschläge“. Nach Enter steht „Test“ im Text, Fokus wieder im Textfeld.
+Ergebnis:
+
+[ ] 33. Ganzes Konzept
+Tasten: mehrere Fehler in verschiedenen Abschnitten, Alt+Umschalt+R. Einmal Vorschlag anhaken und Weiter, einmal im Feld korrigieren und Weiter, einmal nur Weiter.
+Erwartet: Nach jedem Weiter steht der Fokus im Feld mit dem nächsten Wort. Am Ende „Rechtschreibprüfung abgeschlossen.“
+Ergebnis:
+
+[ ] 34. Tab-Reihenfolge im Dialog
+Tasten: Tab mehrmals.
+Erwartet: Wort, Vorschläge, Weiter, In Wörterbuch übernehmen, Schließen, Meine Wörter.
+Ergebnis:
+
+[ ] 35. In Wörterbuch übernehmen und wieder entfernen
+Tasten: bei einem Fehler „In Wörterbuch übernehmen“. Später Alt+Umschalt+R oder Rechtschreibung, Meine Wörter, das Wort mit Leertaste abwählen, Schließen.
+Erwartet: Das Wort gilt danach als richtig. Nach dem Abwählen und Schließen ist es wieder ein Fehler.
+Ergebnis:
+
+[ ] 36. Abschalten
+Tasten: Menü Rechtschreibung, Ton bei Tippfehlern.
+Erwartet: Ansage „Ton bei Tippfehlern aus“. Danach kein Ton mehr.
+Ergebnis:
+
+## Updates (erst mit der Exe)
+
+[ ] 37. Nach Updates suchen
+Tasten: Hilfe, Nach Updates suchen, in der Exe.
+Erwartet: Ohne neueres Release „Konzeptheft ist aktuell.“ Mit neuerem Release die Frage mit Aktualisieren, Versionshinweise, Überspringen, Später.
+Ergebnis:
+
+[ ] 38. Update übernehmen
+Tasten: Aktualisieren, dann Neu starten.
+Erwartet: Das Konzeptheft startet neu in der neuen Version. Der Ordner Dateien ist unverändert.
+Ergebnis:

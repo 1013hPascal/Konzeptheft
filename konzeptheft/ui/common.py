@@ -202,6 +202,13 @@ def ask_buttons(parent: QWidget | None, title: str, text: str, buttons: list[str
     return added.index(clicked) if clicked in added else escape
 
 
+def show_info(parent: QWidget | None, title: str, text: str) -> None:
+    box = QMessageBox(QMessageBox.Icon.Information, title, text,
+                      QMessageBox.StandardButton.NoButton, parent)
+    box.setEscapeButton(box.addButton("OK", QMessageBox.ButtonRole.AcceptRole))
+    box.exec()
+
+
 def show_error(parent: QWidget | None, title: str, text: str) -> None:
     box = QMessageBox(QMessageBox.Icon.Warning, title, text, QMessageBox.StandardButton.NoButton,
                       parent)

@@ -13,7 +13,7 @@ import logging
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QSettings, Qt, QTimer
+from PySide6.QtCore import QSettings, QStandardPaths, Qt, QTimer
 from PySide6.QtGui import QAction, QFont, QKeySequence
 from PySide6.QtWidgets import (QFileDialog, QLabel, QMainWindow, QSplitter, QVBoxLayout,
                                QWidget)
@@ -22,6 +22,7 @@ from konzeptheft import APP_NAME, __version__
 from konzeptheft.core import storage
 from konzeptheft.core.concept import MAX_SUBLEVELS, Concept, Section, heading_level, number_text
 from konzeptheft.core.project import SUFFIX
+from konzeptheft.core.spelling import MyWords, Spelling
 from konzeptheft.core.storage import StorageError
 from konzeptheft.ui.announcer import announce, announcer
 from konzeptheft.ui.common import announce_focus, ask_buttons, ask_name, show_error
@@ -29,6 +30,8 @@ from konzeptheft.ui.editor import SectionEditor
 from konzeptheft.ui.menus import AccessibleMenu
 from konzeptheft.ui.pdf import save_pdf
 from konzeptheft.ui.section_list import MAIN_NAME, NEW_ROW, SAVE_ROW, SectionList
+from konzeptheft.ui.spelling_ui import ENABLED_KEY, SOUND_KEY, SPEAK_KEY, SpellSupport
+from konzeptheft.ui.update_ui import Updater
 
 log = logging.getLogger(__name__)
 
@@ -73,6 +76,16 @@ Strg+E: als LaTeX exportieren.
 Strg+Plus und Strg+Minus: Schrift größer und kleiner.
 Strg+Umschalt+M: letzte Ansage wiederholen.
 
+Rechtschreibung:
+Falsche Wörter sind rot unterstrichen. Ist ein Wort falsch getippt, kommt ein kurzer Ton.
+Beim Wechsel in eine Zeile mit Fehlern sagt das Programm die falschen Wörter an.
+Alt+R im Textfeld: Dialog für das Wort am Cursor.
+Alt+Umschalt+R: Dialog für das ganze Konzept.
+Im Dialog: Wort-Feld, Tab zu den Vorschlägen (Leertaste hakt einen an), Weiter,
+In Wörterbuch übernehmen, Schließen und die Liste Meine Wörter.
+Weiter übernimmt den angehakten Vorschlag oder das geänderte Wort, sonst geht es zum nächsten Fehler.
+In Meine Wörter entfernt das Abwählen eines Wortes es beim Schließen oder bei Weiter.
+
 Beim Speichern entstehen drei Dateien mit gleichem Namen, normalerweise im Ordner Dateien:
 .konzept ist die Projektdatei mit allen Unterlisten, zum Wieder-Öffnen,
 .pdf ist für andere Leser,
@@ -89,9 +102,29 @@ def program_folder() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
+AUTO = object()                          # Rechtschreibprüfung von Windows selbst einrichten
+
+
+def default_spelling(data_dir: Path) -> Spelling | None:
+    """Rechtschreibprüfung von Windows für Deutsch, None wenn es sie nicht gibt."""
+    from konzeptheft.core.windows_spelling import WindowsSpellChecker
+    try:
+        checker = WindowsSpellChecker("de-DE")
+    except OSError as exc:
+        log.warning("Keine Rechtschreibprüfung: %s", exc)
+        return None
+    return Spelling(checker, MyWords(data_dir / "meine-woerter.txt"))
+
+
+def user_data_dir() -> Path:
+    """Ordner für Meine Wörter: Konzeptheft unter %APPDATA%."""
+    return Path(QStandardPaths.writableLocation(QStandardPaths.StandardLocation.AppDataLocation))
+
+
 class MainWindow(QMainWindow):
     def __init__(self, settings: QSettings | None = None,
-                 base_folder: Path | None = None) -> None:
+                 base_folder: Path | None = None, spelling=AUTO,
+                 exe_path: Path | None = None) -> None:
         super().__init__()
         self.settings = settings or QSettings(APP_NAME, APP_NAME)
         self.base_folder = base_folder or program_folder()
@@ -131,6 +164,9 @@ class MainWindow(QMainWindow):
         self.editor.closeRequested.connect(self.close_editor)
         self.editor.textChanged.connect(self._text_changed)
 
+        self.spell = SpellSupport(self, default_spelling(user_data_dir()) if spelling is AUTO
+                                  else spelling)
+        self.updater = Updater(self, exe_path)
         self._build_actions()
         self._build_menus()
         announcer.target = self
@@ -157,6 +193,16 @@ class MainWindow(QMainWindow):
         if widget is not None:
             action.setShortcutContext(Qt.ShortcutContext.WidgetShortcut)
             widget.addAction(action)
+        return action
+
+    def _toggle(self, text: str, key: str, changed) -> QAction:
+        """Ein- und ausschaltbarer Menüeintrag. Vorgabe: an."""
+        action = QAction(text, self)
+        action.setCheckable(True)
+        action.setChecked(str(self.settings.value(key, "true")).lower() == "true")
+        action.toggled.connect(changed)
+        action.toggled.connect(lambda on: announce(f"{text.replace('&', '')} "
+                                                   + ("an" if on else "aus")))
         return action
 
     def _build_actions(self) -> None:
@@ -195,11 +241,24 @@ class MainWindow(QMainWindow):
                                        "Ctrl+Shift+M")
         self.act_help = self._action("&Tasten", self.show_help, "F1")
         self.act_about = self._action("Ü&ber Konzeptheft", self.show_about)
+        self.act_spell_word = self._action("&Wort prüfen…", self.spell.check_word, "Alt+R")
+        self.act_spell_all = self._action("&Ganzes Konzept prüfen…", self.spell.check_concept,
+                                          "Alt+Shift+R")
+        self.act_my_words = self._action("&Meine Wörter…", self.spell.edit_my_words)
+        self.act_spell_flags = [
+            self._toggle(text, key, lambda on, k=key: self.spell.set_flag(k, on))
+            for text, key in (("Rechtschreib&prüfung an", ENABLED_KEY),
+                              ("&Ton bei Tippfehlern", SOUND_KEY),
+                              ("Fehler beim Lesen &ansagen", SPEAK_KEY))]
+        self.act_update = self._action("Nach &Updates suchen…", self.updater.check_now)
+        self.act_update_start = self._toggle("Beim Start nach Updates &suchen",
+                                             "update/check_at_start",
+                                             lambda on: setattr(self.updater, "check_at_start", on))
         # Diese Kürzel gelten im ganzen Fenster
         for action in (self.act_new, self.act_open, self.act_save, self.act_save_as,
                        self.act_latex,
                        self.act_bigger, self.act_smaller, self.act_font_default,
-                       self.act_repeat, self.act_help):
+                       self.act_repeat, self.act_help, self.act_spell_word, self.act_spell_all):
             self.addAction(action)
 
     def _build_menus(self) -> None:
@@ -224,8 +283,14 @@ class MainWindow(QMainWindow):
         view_menu.addSeparator()
         view_menu.addAction(self.act_repeat)
         help_menu = AccessibleMenu("&Hilfe", self)
-        help_menu.addActions([self.act_help, self.act_about])
-        for menu in (file_menu, edit_menu, format_menu, view_menu, help_menu):
+        spell_menu = AccessibleMenu("Recht&schreibung", self)
+        spell_menu.addActions([self.act_spell_word, self.act_spell_all, self.act_my_words])
+        spell_menu.addSeparator()
+        spell_menu.addActions(self.act_spell_flags)
+        help_menu.addActions([self.act_help, self.act_update, self.act_update_start])
+        help_menu.addSeparator()
+        help_menu.addAction(self.act_about)
+        for menu in (file_menu, edit_menu, format_menu, spell_menu, view_menu, help_menu):
             bar.addMenu(menu)
 
     def show_context_menu(self, position) -> None:
@@ -427,6 +492,7 @@ class MainWindow(QMainWindow):
         self.editor.setEnabled(True)
         self.update_title()
         self.editor.setFocus()
+        self.spell.section_opened(section)
 
     def close_editor(self) -> None:
         """Escape im Textfeld: Text ist schon übernommen, zurück auf genau diesen Abschnitt,
@@ -598,6 +664,7 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event) -> None:
         if self.ask_save_changes():
             self.autosave_timer.stop()
+            self.updater.shutdown()
             event.accept()
         else:
             event.ignore()

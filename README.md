@@ -15,6 +15,8 @@ Ein Konzept besteht aus benannten Abschnitten. Statt wie in Word lange zu scroll
 - Automatisches Speichern jede Minute, sobald ein Speicherort gewählt ist.
 - Export als LaTeX (.tex) mit fertigem Kopf für deutsche Texte, mit Strg+E.
 - Alte Markdown-Dateien (.md) lassen sich öffnen.
+- Rechtschreibprüfung wie in Word: rote Wellenlinie, ein kurzer Ton beim Vertippen, Ansage der Fehler beim Lesen und ein Dialog zum Korrigieren (Alt+R und Alt+Umschalt+R).
+- Sucht beim Start nach Updates und tauscht die Exe auf Wunsch selbst aus.
 - Einstellbare Schriftgröße.
 
 ## Barrierefreiheit
@@ -59,6 +61,19 @@ Ein Konzept besteht aus benannten Abschnitten. Statt wie in Word lange zu scroll
 - Strg+Umschalt+M: letzte Ansage wiederholen.
 - F1: alle Tasten anzeigen.
 
+### Rechtschreibung
+
+- Falsche Wörter sind rot gewellt unterstrichen. Ist ein Wort fertig getippt und falsch, kommt ein kurzer Ton.
+- Beim Wechsel in eine Zeile mit Fehlern sagt das Programm die falschen Wörter an, zum Beispiel „Fehler: Tset“. Bei Strg+Pfeil auf ein falsches Wort sagt es „Rechtschreibfehler“.
+- Alt+R im Textfeld: Dialog für das Wort am Cursor.
+- Alt+Umschalt+R: Dialog für alle Fehler im ganzen Konzept, Abschnitt für Abschnitt.
+- Im Dialog: Feld mit dem Wort, mit Tab die Vorschläge (Leertaste hakt einen an), Weiter, In Wörterbuch übernehmen, Schließen und die Liste Meine Wörter.
+- Weiter übernimmt den angehakten Vorschlag oder das im Feld geänderte Wort. Ist nichts geändert, geht es ohne Änderung zum nächsten Fehler.
+- Meine Wörter: Alle übernommenen Wörter sind angehakt. Ein abgewähltes Wort wird bei Schließen oder Weiter aus der Liste gelöscht.
+- Im Menü Rechtschreibung lassen sich Prüfung, Ton und Ansagen einzeln abschalten.
+
+Die Prüfung nutzt die Rechtschreibprüfung von Windows. Dafür muss Deutsch als Sprache in Windows installiert sein.
+
 ## Dateien
 
 Gespeichert wird normalerweise im Ordner „Dateien“ im Programmordner. Zu jedem Konzept gibt es drei Dateien mit gleichem Namen:
@@ -69,9 +84,14 @@ Gespeichert wird normalerweise im Ordner „Dateien“ im Programmordner. Zu jed
 
 Mit Strg+E entsteht auf Wunsch zusätzlich eine LaTeX-Datei (.tex). Sie lässt sich mit pdflatex oder lualatex übersetzen, zum Beispiel mit MiKTeX. Der Kopf lädt unter anderem utf8, babel (ngerman), T1-Schrift, csquotes, booktabs, tabularx, enumitem, amsmath, siunitx und hyperref. Die Abschnitte werden \section, \subsection, \subsubsection, \paragraph und \subparagraph, mit denselben Nummern wie im Konzeptheft. Dazu kommt ein Inhaltsverzeichnis.
 
+## Updates
+
+Die Exe sucht bei jedem Start im Hintergrund nach einer neuen Version auf GitHub. Gibt es eine, fragt sie nach. Die neue Version wird heruntergeladen, geprüft und beim Beenden eingesetzt. Die bisherige Exe kommt in die Sicherheitskopien unter %LOCALAPPDATA%\Konzeptheft. Der Ordner Dateien bleibt unberührt.
+Sofort suchen: Hilfe, Nach Updates suchen. Abschalten: Hilfe, Beim Start nach Updates suchen.
+
 ## Systemanforderungen
 
-Windows 10 oder 11. Für den Quellcode: Python 3.11 oder neuer.
+Windows 10 oder 11, mit Deutsch als installierter Sprache für die Rechtschreibprüfung. Für den Quellcode: Python 3.11 oder neuer.
 
 ## Werkzeuge und Bibliotheken
 
@@ -101,3 +121,10 @@ python -m pytest
 - Konzept Konzeptheft.md: das ursprüngliche Konzept.
 - ENTSCHEIDUNGEN.md: wo und warum das Programm vom Konzept abweicht oder es ergänzt.
 - checklisten\stufe-1-bis-4.md: Prüfliste für NVDA und Braillezeile.
+
+## Änderungen
+
+### 1.0.0 (11.10.2026)
+
+- Rechtschreibprüfung und Update Funktionen hinzugefügt
+- Erste Version

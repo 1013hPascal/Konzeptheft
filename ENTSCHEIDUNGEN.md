@@ -44,6 +44,31 @@ Abschnitte: Hauptliste \section bis vierte Unterebene \subparagraph. LaTeX numme
 Zeilen eines Absatzes werden mit \\ getrennt, damit die Zeilenumbrüche erhalten bleiben.
 Geprüft: Eine Beispieldatei mit allen fünf Ebenen und Sonderzeichen läuft mit pdflatex (MiKTeX) ohne Fehler und Warnungen durch.
 
+## Rechtschreibung (Wunsch vom 11.10.2026)
+
+Geprüft wird mit der Rechtschreibprüfung von Windows (Spell Checking API), angesprochen über ctypes.
+Grund: Sie ist in Windows schon da, kennt zusammengesetzte deutsche Wörter und braucht weder eine neue Bibliothek noch ein Wörterbuch im Programm. Voraussetzung: Deutsch ist in Windows installiert.
+Meine Wörter liegen in %APPDATA%\Konzeptheft\meine-woerter.txt, nicht im Wörterbuch von Windows. So lassen sie sich im Dialog wieder entfernen.
+Qt gibt Rechtschreibfehler nicht an NVDA weiter (geprüft im Quelltext von Qt 6.11: weder die Unterstreichung noch eine Fehlermarkierung kommt über UI Automation an). Deshalb sagt das Programm selbst an:
+- beim Wechsel in eine Zeile mit Pfeil hoch oder runter, Bild auf oder ab, Strg+Pos1 oder Strg+Ende: „Fehler: Wort, Wort“,
+- bei Strg+Pfeil links oder rechts auf ein falsches Wort: „Rechtschreibfehler“,
+- beim Öffnen eines Abschnitts: die Anzahl der Fehler.
+Beim Vorlesen mit NVDA (Alles lesen) kommen diese Ansagen nicht.
+Der Ton kommt, wenn ein falsches Wort mit Leerzeichen, Satzzeichen oder Enter beendet wird. Es ist ein eigener, leiser Doppelton, abgespielt mit winsound ohne Warten, damit das Tippen nicht stockt.
+Alt+R gilt im Textfeld. In der Liste sagt es, wofür Alt+R und Alt+Umschalt+R da sind.
+Im Dialog ist höchstens ein Vorschlag angehakt, wie bei Optionsfeldern. Doppelte Wörter („und und“) haben den Vorschlag „Doppeltes Wort löschen“.
+„In Wörterbuch übernehmen“ nimmt das Wort aus dem Feld. Wurde es dort geändert, wird es auch im Text ersetzt.
+Ohne Fehler im Konzept öffnet Alt+Umschalt+R keinen Dialog, sondern sagt „Keine Rechtschreibfehler.“ Meine Wörter lassen sich dann über Rechtschreibung, Meine Wörter bearbeiten.
+Die rote Farbe der Wellenlinie ist fest. Die Information gibt es aber auch ohne Farbe, über Ton, Ansage und Dialog.
+
+## Updates (Wunsch vom 11.10.2026)
+
+Übernommen aus dem CodeCockpit (core/update.py, ui/update_ui.py). Quelle: das neueste Release von 1013hPascal/Konzeptheft.
+Erwartet am Release: Konzeptheft.zip mit Ordner Konzeptheft-vX.Y.Z, darin Konzeptheft.exe und version.txt. So veröffentlicht das CodeCockpit. Eine einzelne Konzeptheft.exe am Release geht auch.
+Statt httpx nimmt das Konzeptheft urllib aus Python, ohne neue Bibliothek.
+Sicherheitskopien der alten Exe liegen unter %LOCALAPPDATA%\Konzeptheft\Sicherheitskopien, damit der Ordner der Exe übersichtlich bleibt.
+main.py kennt --selbsttest für den Test der Exe beim Bauen im CodeCockpit.
+
 ## Überschriften im Textfeld
 
 Im Textfeld steht Ebene 1 als „# “, Ebene 2 als „## “, Ebene 3 als „### “. So steht es auch in der .konzept-Datei.

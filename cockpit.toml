@@ -10,3 +10,6 @@ enabled = [
     "terminal_explain",
     "versions",
 ]
+
+[readme.managed."README.md"]
+changes = "167e5323f598"
