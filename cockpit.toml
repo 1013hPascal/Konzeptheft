@@ -12,7 +12,7 @@ enabled = [
 ]
 
 [readme.managed."README.md"]
-changes = "7fe111c49a1c"
+changes = "a4908175bb28"
 
 [exe.build]
 start_file = "main.py"

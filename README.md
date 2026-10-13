@@ -124,16 +124,15 @@ python -m pytest
 
 ## Änderungen
 
+### 1.0.5 (13.10.2026)
+
+- README und Konfiguration aktualisiert
+
+### 1.0.4 (13.10.2026)
+
+- Version 1.0.4
+- Exe-Einstellungen
+
 ### 1.0.3 (11.10.2026)
 
 - Konzeptdateien im Verzeichnis Dateien gelöscht
-
-### 1.0.2 (11.10.2026)
-
-- Readme und Konfiguration aktualisiert
-
-### 1.0.1 (11.10.2026)
-
-- Version 1.0.1
-- Exe-Einrichtung mit KI
-- Exe-Einstellungen
