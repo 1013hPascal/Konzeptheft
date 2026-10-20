@@ -8,7 +8,8 @@ from __future__ import annotations
 
 from html import escape
 
-from konzeptheft.core.concept import Concept, export_number, heading_level, strip_heading
+from konzeptheft.core.blocks import Heading, ListBlock, parse
+from konzeptheft.core.concept import Concept, export_number, strip_heading
 
 MAX_HTML_HEADING = 6
 
@@ -26,27 +27,27 @@ def to_plain_text(concept: Concept) -> str:
     return "\n".join(parts).rstrip("\n") + "\n"
 
 
+def _list_html(block: ListBlock) -> str:
+    tag = "ol" if block.ordered else "ul"
+    items = []
+    for item in block.items:
+        inner = escape(item.text) + (_list_html(item.sub) if item.sub is not None else "")
+        items.append(f"<li>{inner}</li>")
+    return f"<{tag}>{''.join(items)}</{tag}>"
+
+
 def _body_html(text: str, depth: int) -> list[str]:
-    """Absätze und Überschriften aus dem Text eines Abschnitts. depth 0 ist die Hauptebene."""
+    """Absätze, Listen und Überschriften aus dem Text eines Abschnitts. depth 0 ist die
+    Hauptebene."""
     html: list[str] = []
-    paragraph: list[str] = []
-
-    def flush() -> None:
-        if paragraph:
-            html.append("<p>" + "<br>".join(paragraph) + "</p>")
-            paragraph.clear()
-
-    for line in text.splitlines():
-        level = heading_level(line)
-        if level:
-            flush()
-            tag = f"h{min(MAX_HTML_HEADING, depth + 1 + level)}"
-            html.append(f"<{tag}>{escape(strip_heading(line))}</{tag}>")
-        elif line.strip():
-            paragraph.append(escape(line))
+    for block in parse(text):
+        if isinstance(block, Heading):
+            tag = f"h{min(MAX_HTML_HEADING, depth + 1 + block.level)}"
+            html.append(f"<{tag}>{escape(block.text)}</{tag}>")
+        elif isinstance(block, ListBlock):
+            html.append(_list_html(block))
         else:
-            flush()
-    flush()
+            html.append("<p>" + "<br>".join(escape(line) for line in block.lines) + "</p>")
     return html
 
 

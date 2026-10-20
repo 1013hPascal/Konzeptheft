@@ -48,9 +48,9 @@ def test_own_version_uses_version_file(exe):
 
 
 def test_check_only_offers_higher_version(exe):
-    data = release([asset("Konzeptheft.zip")], tag="v0.2.0")
-    assert update.check(exe, fetch=lambda url: data).tag == "v0.2.0"
-    assert update.check(exe, skipped="v0.2.0", fetch=lambda url: data) is None
+    data = release([asset("Konzeptheft.zip")], tag="v99.0.0")
+    assert update.check(exe, fetch=lambda url: data).tag == "v99.0.0"
+    assert update.check(exe, skipped="v99.0.0", fetch=lambda url: data) is None
     old = release([asset("Konzeptheft.zip")], tag="v0.1.0")
     assert update.check(exe, fetch=lambda url: old) is None
     assert update.check(exe, fetch=lambda url: None) is None          # noch kein Release

@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 
 from konzeptheft.core.concept import Concept
+from konzeptheft.core.docx import to_docx_bytes
 from konzeptheft.core.export import to_plain_text
 from konzeptheft.core.latex import to_latex
 from konzeptheft.core.markdown import from_markdown
@@ -50,15 +51,26 @@ def pdf_path(path: Path) -> Path:
     return path.with_suffix(".pdf")
 
 
+def with_suffix(path: Path, suffix: str) -> Path:
+    """Endung anhängen, außer sie ist schon da ("Plan 1.2" wird "Plan 1.2.tex")."""
+    return path if path.suffix.lower() == suffix else path.with_name(path.name + suffix)
+
+
 def latex_path(path: Path) -> Path:
-    """Endung .tex anhängen, außer sie ist schon da ("Plan 1.2" bleibt "Plan 1.2.tex")."""
-    return path if path.suffix.lower() == ".tex" else path.with_name(path.name + ".tex")
+    return with_suffix(path, ".tex")
 
 
-def write_atomic(path: Path, content: str) -> None:
+def docx_path(path: Path) -> Path:
+    return with_suffix(path, ".docx")
+
+
+def write_atomic(path: Path, content: str | bytes) -> None:
     temp = path.with_name(path.name + ".tmp")
     try:
-        temp.write_text(content, encoding="utf-8", newline="\n")
+        if isinstance(content, bytes):
+            temp.write_bytes(content)
+        else:
+            temp.write_text(content, encoding="utf-8", newline="\n")
         os.replace(temp, path)
     except OSError as exc:
         temp.unlink(missing_ok=True)
@@ -76,6 +88,10 @@ def save_text(path: Path, concept: Concept) -> None:
 
 def save_latex(path: Path, concept: Concept) -> None:
     write_atomic(path, to_latex(concept))
+
+
+def save_docx(path: Path, concept: Concept) -> None:
+    write_atomic(path, to_docx_bytes(concept))
 
 
 def load(path: Path) -> Concept:

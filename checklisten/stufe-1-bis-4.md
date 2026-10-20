@@ -207,3 +207,25 @@ Ergebnis:
 Tasten: Aktualisieren, dann Neu starten.
 Erwartet: Das Konzeptheft startet neu in der neuen Version. Der Ordner Dateien ist unverändert.
 Ergebnis:
+
+## Listen, Word und Titel
+
+[ ] 39. Alt+T
+Tasten: in der Liste oder im Textfeld Alt+T, neuen Titel tippen, Enter.
+Erwartet: Feld „Titel des Konzepts“ mit dem bisherigen Titel. Danach Ansage „Titel: …“. Escape ändert nichts.
+Ergebnis:
+
+[ ] 40. Listen schreiben
+Tasten: im Textfeld „- Punkt A“, Enter, zwei Leerzeichen und „- Unterpunkt“, Enter, „1. Erstens“.
+Erwartet: Im Textfeld steht es so, wie getippt.
+Ergebnis:
+
+[ ] 41. Word-Export
+Tasten: Strg+Umschalt+E, Namen bestätigen, die .docx in Word öffnen.
+Erwartet: Ansage „Name.docx exportiert“. In Word springt H von Abschnitt zu Abschnitt, die Liste wird als Liste mit Ebenen vorgelesen.
+Ergebnis:
+
+[ ] 42. LaTeX mit Listen
+Tasten: Strg+E, die .tex mit pdflatex übersetzen.
+Erwartet: Keine Fehler. Die Listen erscheinen als Aufzählung und Nummerierung.
+Ergebnis:

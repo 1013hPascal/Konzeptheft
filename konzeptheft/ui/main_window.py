@@ -66,13 +66,18 @@ Escape: zurück in die Liste. Der Text wird übernommen.
 Alt+1, Alt+2, Alt+3: Zeile wird Überschrift der Ebene 1, 2 oder 3.
 Alt+0: Zeile wird wieder normaler Text.
 Umschalt+Enter: neuer Absatz.
+Listen: Zeile mit „- “ oder „* “ beginnen für Punkte, mit „1. “ für Nummern.
+Zwei Leerzeichen davor: eine Ebene tiefer. Eine leere Zeile beendet die Liste.
+In Word, LaTeX und PDF werden daraus echte Listen.
 
 Überall:
 Strg+N: neues Konzept.
 Strg+O: öffnen.
 Strg+S: speichern.
 Strg+Umschalt+S: speichern unter.
+Strg+Umschalt+E: als Word exportieren.
 Strg+E: als LaTeX exportieren.
+Alt+T: Titel des Konzepts ändern.
 Strg+Plus und Strg+Minus: Schrift größer und kleiner.
 Strg+Umschalt+M: letzte Ansage wiederholen.
 
@@ -211,6 +216,7 @@ class MainWindow(QMainWindow):
         self.act_save = self._action("&Speichern", self.save, QKeySequence.StandardKey.Save)
         self.act_save_as = self._action("Speichern &unter…", self.save_as, "Ctrl+Shift+S")
         self.act_latex = self._action("Als &LaTeX exportieren…", self.export_latex, "Ctrl+E")
+        self.act_word = self._action("Als &Word exportieren…", self.export_word, "Ctrl+Shift+E")
         self.act_quit = self._action("&Beenden", self.close)
         self.act_new_section = self._action("Neuer Abschnitt am &Ende…", self.add_section_at_end)
         self.act_insert = self._action("Neuer Abschnitt &darunter…", self.insert_section,
@@ -225,7 +231,7 @@ class MainWindow(QMainWindow):
         self.act_sub_open = self._action("Unterliste ö&ffnen\tPfeil rechts", self.open_sublist)
         self.act_sub_close = self._action("&Zurück zur oberen Liste\tPfeil links",
                                           self.close_sublist)
-        self.act_title = self._action("&Titel ändern…", self.change_title)
+        self.act_title = self._action("&Titel ändern…", self.change_title, "Alt+T")
         self.act_headings = [
             self._action(f"Überschrift Ebene &{level}", lambda lv=level: self.set_heading(lv),
                          f"Alt+{level}", self.editor) for level in (1, 2, 3)]
@@ -256,7 +262,7 @@ class MainWindow(QMainWindow):
                                              lambda on: setattr(self.updater, "check_at_start", on))
         # Diese Kürzel gelten im ganzen Fenster
         for action in (self.act_new, self.act_open, self.act_save, self.act_save_as,
-                       self.act_latex,
+                       self.act_latex, self.act_word, self.act_title,
                        self.act_bigger, self.act_smaller, self.act_font_default,
                        self.act_repeat, self.act_help, self.act_spell_word, self.act_spell_all):
             self.addAction(action)
@@ -266,7 +272,7 @@ class MainWindow(QMainWindow):
         file_menu = AccessibleMenu("&Datei", self)
         file_menu.addActions([self.act_new, self.act_open, self.act_save, self.act_save_as])
         file_menu.addSeparator()
-        file_menu.addAction(self.act_latex)
+        file_menu.addActions([self.act_word, self.act_latex])
         file_menu.addSeparator()
         file_menu.addAction(self.act_quit)
         edit_menu = AccessibleMenu("&Bearbeiten", self)
@@ -621,21 +627,29 @@ class MainWindow(QMainWindow):
         return True
 
     def export_latex(self) -> bool:
-        """LaTeX-Datei (.tex). Vorschlag: gleicher Name und Ordner wie die Projektdatei."""
+        return self._export("LaTeX", ".tex", storage.save_latex)
+
+    def export_word(self) -> bool:
+        return self._export("Word", ".docx", storage.save_docx)
+
+    def _export(self, kind: str, suffix: str, save) -> bool:
+        """Export als eigene Datei. Vorschlag: gleicher Name und Ordner wie die Projektdatei.
+        Danach kehrt der Fokus dorthin zurück, wo er vorher war."""
+        focus = self.focusWidget()
         name = self.path.stem if self.path else (self.concept.title or "Konzept")
-        suggestion = str(Path(self._start_folder()) / f"{name}.tex")
-        chosen, _ = QFileDialog.getSaveFileName(self, "Als LaTeX exportieren", suggestion,
-                                                "LaTeX (*.tex)")
+        suggestion = str(Path(self._start_folder()) / f"{name}{suffix}")
+        chosen, _ = QFileDialog.getSaveFileName(self, f"Als {kind} exportieren", suggestion,
+                                                f"{kind} (*{suffix})")
+        if focus is not None:
+            focus.setFocus()
         if not chosen:
-            self.list.setFocus()
             return False
-        target = storage.latex_path(Path(chosen))
+        target = storage.with_suffix(Path(chosen), suffix)
         try:
-            storage.save_latex(target, self.concept)
+            save(target, self.concept)
         except StorageError as exc:
             show_error(self, "Exportieren", str(exc))
             return False
-        self.list.setFocus()
         announce(f"{target.name} exportiert")
         return True
 

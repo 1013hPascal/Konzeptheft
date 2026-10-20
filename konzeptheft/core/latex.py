@@ -6,13 +6,15 @@ dieselben Nummern wie das Konzeptheft (1, 1.1, 1.1.1 ...).
 
 Überschriften im Text eines Abschnitts (Alt+1 bis Alt+3) werden Befehle mit Stern, eine Ebene
 unter dem Abschnitt. Sie haben keine Nummer, damit die Nummern der Abschnitte stimmen.
+Listen im Text ("- ", "* ", "1. ") werden itemize und enumerate, auch verschachtelt (blocks.py).
 """
 from __future__ import annotations
 
 import re
 
 from konzeptheft import APP_NAME
-from konzeptheft.core.concept import Concept, heading_level, strip_heading
+from konzeptheft.core.blocks import Heading, ListBlock, parse
+from konzeptheft.core.concept import Concept
 
 SECTION_COMMANDS = ["section", "subsection", "subsubsection", "paragraph", "subparagraph"]
 
@@ -75,29 +77,30 @@ def _command(index: int, title: str, numbered: bool) -> str:
     return f"\\{name}{'' if numbered else '*'}{{{escape(title)}}}"
 
 
+def _list(block: ListBlock, indent: str = "") -> list[str]:
+    """Liste als itemize (Punkte) oder enumerate (Nummern), Unterlisten eingerückt."""
+    env = "enumerate" if block.ordered else "itemize"
+    out = [f"{indent}\\begin{{{env}}}"]
+    for item in block.items:
+        out.append(f"{indent}  \\item {escape(item.text)}")
+        if item.sub is not None:
+            out += _list(item.sub, indent + "    ")
+    out.append(f"{indent}\\end{{{env}}}")
+    return out
+
+
 def _body(text: str, depth: int) -> list[str]:
-    """Absätze und Text-Überschriften eines Abschnitts. Zeilen eines Absatzes werden mit \\\\
-    getrennt, damit die Zeilenumbrüche erhalten bleiben."""
+    """Absätze, Listen und Text-Überschriften eines Abschnitts. Zeilen eines Absatzes werden mit
+    \\\\ getrennt, damit die Zeilenumbrüche erhalten bleiben."""
     out: list[str] = []
-    paragraph: list[str] = []
-
-    def flush() -> None:
-        if paragraph:
-            out.append(" \\\\\n".join(paragraph))
-            out.append("")
-            paragraph.clear()
-
-    for line in text.splitlines():
-        level = heading_level(line)
-        if level:
-            flush()
-            out.append(_command(depth + level, strip_heading(line), numbered=False))
-            out.append("")
-        elif line.strip():
-            paragraph.append(escape(line.rstrip()))
+    for block in parse(text):
+        if isinstance(block, Heading):
+            out.append(_command(depth + block.level, block.text, numbered=False))
+        elif isinstance(block, ListBlock):
+            out += _list(block)
         else:
-            flush()
-    flush()
+            out.append(" \\\\\n".join(escape(line) for line in block.lines))
+        out.append("")
     return out
 
 

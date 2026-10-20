@@ -69,6 +69,16 @@ Statt httpx nimmt das Konzeptheft urllib aus Python, ohne neue Bibliothek.
 Sicherheitskopien der alten Exe liegen unter %LOCALAPPDATA%\Konzeptheft\Sicherheitskopien, damit der Ordner der Exe übersichtlich bleibt.
 main.py kennt --selbsttest für den Test der Exe beim Bauen im CodeCockpit.
 
+## Listen, Word-Export und Alt+T (Wunsch vom 20.10.2026)
+
+Listen im Text: Zeilen, die mit „- “, „* “ oder „• “ beginnen, sind Aufzählungen. Zeilen mit „1. “ oder „1) “ sind nummerierte Listen. Je zwei Leerzeichen oder ein Tab davor machen eine Ebene tiefer, höchstens vier (so viele erlaubt LaTeX). Eine leere Zeile beendet die Liste.
+Grund: So schreibt man Listen auch in Markdown, und im Textfeld liest der Screenreader die Zeichen mit.
+PDF, LaTeX und Word verstehen den Text gleich (core/blocks.py).
+Word (.docx) wird ohne zusätzliche Bibliothek geschrieben (core/docx.py). Abschnitte sind echte Word-Überschriften mit Gliederungsebene, Listen echte Word-Listen. Jede nummerierte Liste beginnt wieder bei 1. Sprache Deutsch.
+Geprüft: Word öffnet die Datei ohne Meldung, zeigt Überschrift 1 und 2, Listenabsätze mit Punkten und Nummern.
+Word: Strg+Umschalt+E. LaTeX bleibt Strg+E. Beide unter Datei. Nach dem Export kommt der Fokus dorthin zurück, wo er vorher war.
+Alt+T öffnet das Feld für den Titel, überall im Fenster. Alt+Umschalt+T gab es im Code nicht, deshalb war dort nichts zu entfernen.
+
 ## Überschriften im Textfeld
 
 Im Textfeld steht Ebene 1 als „# “, Ebene 2 als „## “, Ebene 3 als „### “. So steht es auch in der .konzept-Datei.

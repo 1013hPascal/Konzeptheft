@@ -13,7 +13,9 @@ Ein Konzept besteht aus benannten Abschnitten. Statt wie in Word lange zu scroll
 - Speichern als Projektdatei (.konzept), die die ganze Struktur behält.
 - Bei jedem Speichern entstehen dazu eine PDF und eine Textdatei für andere Leser. In der PDF werden die Abschnitte zu Überschriften: Hauptliste Ebene 1, erste Unterliste Ebene 2 und so weiter.
 - Automatisches Speichern jede Minute, sobald ein Speicherort gewählt ist.
+- Export als Word (.docx) mit echten Überschriften und Listen, mit Strg+Umschalt+E.
 - Export als LaTeX (.tex) mit fertigem Kopf für deutsche Texte, mit Strg+E.
+- Listen im Text mit „- “ oder „1. “ werden in Word, LaTeX und PDF zu echten Listen.
 - Alte Markdown-Dateien (.md) lassen sich öffnen.
 - Rechtschreibprüfung wie in Word: rote Wellenlinie, ein kurzer Ton beim Vertippen, Ansage der Fehler beim Lesen und ein Dialog zum Korrigieren (Alt+R und Alt+Umschalt+R).
 - Sucht beim Start nach Updates und tauscht die Exe auf Wunsch selbst aus.
@@ -49,6 +51,7 @@ Ein Konzept besteht aus benannten Abschnitten. Statt wie in Word lange zu scroll
 - Escape: zurück in die Liste, auf genau den Abschnitt, aus dem Sie kamen. Der Text wird übernommen.
 - Alt+1, Alt+2, Alt+3: Die Zeile wird Überschrift der Ebene 1, 2 oder 3.
 - Alt+0: Die Zeile wird wieder normaler Text.
+- Listen: Zeile mit „- “ oder „* “ beginnen für Punkte, mit „1. “ für Nummern. Zwei Leerzeichen davor machen eine Ebene tiefer, bis zu vier Ebenen. Eine leere Zeile beendet die Liste.
 
 ### Überall
 
@@ -56,7 +59,9 @@ Ein Konzept besteht aus benannten Abschnitten. Statt wie in Word lange zu scroll
 - Strg+O: öffnen.
 - Strg+S: speichern.
 - Strg+Umschalt+S: speichern unter.
+- Strg+Umschalt+E: als Word exportieren.
 - Strg+E: als LaTeX exportieren.
+- Alt+T: Titel des Konzepts ändern.
 - Strg+Plus, Strg+Minus, Strg+0: Schrift größer, kleiner, normal.
 - Strg+Umschalt+M: letzte Ansage wiederholen.
 - F1: alle Tasten anzeigen.
@@ -82,7 +87,9 @@ Gespeichert wird normalerweise im Ordner „Dateien“ im Programmordner. Zu jed
 - .pdf: zum Weitergeben, mit Überschriften für jede Ebene.
 - .txt: reiner Text, die Nummern zeigen die Ebene.
 
-Mit Strg+E entsteht auf Wunsch zusätzlich eine LaTeX-Datei (.tex). Sie lässt sich mit pdflatex oder lualatex übersetzen, zum Beispiel mit MiKTeX. Der Kopf lädt unter anderem utf8, babel (ngerman), T1-Schrift, csquotes, booktabs, tabularx, enumitem, amsmath, siunitx und hyperref. Die Abschnitte werden \section, \subsection, \subsubsection, \paragraph und \subparagraph, mit denselben Nummern wie im Konzeptheft. Dazu kommt ein Inhaltsverzeichnis.
+Mit Strg+Umschalt+E entsteht auf Wunsch eine Word-Datei (.docx). Die Abschnitte sind dort echte Word-Überschriften (Überschrift 1, 2 und so weiter), so dass man in Word mit NVDA von Überschrift zu Überschrift springen kann. Listen sind echte Word-Listen.
+
+Mit Strg+E entsteht auf Wunsch zusätzlich eine LaTeX-Datei (.tex). Sie lässt sich mit pdflatex oder lualatex übersetzen, zum Beispiel mit MiKTeX. Der Kopf lädt unter anderem utf8, babel (ngerman), T1-Schrift, csquotes, booktabs, tabularx, enumitem, amsmath, siunitx und hyperref. Die Abschnitte werden \section, \subsection, \subsubsection, \paragraph und \subparagraph, mit denselben Nummern wie im Konzeptheft. Listen werden itemize (Punkte) und enumerate (Nummern), auch verschachtelt. Dazu kommt ein Inhaltsverzeichnis.
 
 ## Updates
 
@@ -124,6 +131,10 @@ python -m pytest
 
 ## Änderungen
 
+### 1.1.0 (20.10.2026)
+
+- Export mit Word und pdf
+
 ### 1.0.5 (13.10.2026)
 
 - README und Konfiguration aktualisiert
@@ -132,7 +143,3 @@ python -m pytest
 
 - Version 1.0.4
 - Exe-Einstellungen
-
-### 1.0.3 (11.10.2026)
-
-- Konzeptdateien im Verzeichnis Dateien gelöscht
