@@ -1,6 +1,6 @@
 """Konzeptheft starten: python main.py [datei.konzept]
 
-Ohne Datei öffnet das Programm das zuletzt benutzte Konzept, wenn es noch da ist.
+Ohne Datei startet das Programm mit einem leeren Konzept (Wunsch vom 21.10.2026).
 
 Optionen:
   --selbsttest  kurz starten und mit Code 0 beenden, ohne Datei und ohne Update-Suche
@@ -53,8 +53,6 @@ def main(argv: list[str] | None = None) -> int:
     files = [Path(a) for a in args if not a.startswith("-")]
     if files:
         window.open_file(files[0])
-    else:
-        window.open_last_file()
     window.updater.start()
     return app.exec()
 

@@ -574,8 +574,6 @@ class MainWindow(QMainWindow):
         # Eine alte .md-Datei wird beim ersten Speichern als .konzept gespeichert (mit Rückfrage)
         is_project = path.suffix.lower() == SUFFIX
         self.set_concept(concept, path if is_project else None)
-        if is_project:
-            self._remember(path)
         announce(f"{concept.title or path.stem} geöffnet, {len(concept)} Abschnitte")
         return True
 
@@ -595,7 +593,6 @@ class MainWindow(QMainWindow):
         if not self.concept.title:
             self.concept.title = path.stem
         self.path = path
-        self._remember(path)
         return self._write(path)
 
     def _write(self, path: Path, quiet: bool = False) -> bool:
@@ -666,14 +663,6 @@ class MainWindow(QMainWindow):
             return str(storage.data_folder(self.base_folder))
         except OSError:
             return str(Path.home() / "Documents")
-
-    def _remember(self, path: Path) -> None:
-        self.settings.setValue("last_file", str(path))
-
-    def open_last_file(self) -> None:
-        last = self.settings.value("last_file", "")
-        if last and Path(last).is_file() and Path(last).suffix.lower() == SUFFIX:
-            self.open_file(Path(last))
 
     def closeEvent(self, event) -> None:
         if self.ask_save_changes():

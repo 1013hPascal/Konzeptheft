@@ -99,7 +99,7 @@ Der Titel steht in der .konzept-Datei. Ist er leer, wird beim ersten Speichern d
 
 ## Weitere Ergänzungen
 
-- Beim Start öffnet das Programm das zuletzt benutzte Konzept.
+- Beim Start ist das Konzept leer (Wunsch vom 21.10.2026, vorher öffnete es das zuletzt benutzte). Ein Konzept öffnen Sie mit Strg+O. Der Öffnen-Dialog beginnt im Ordner Dateien.
 - Alt+N auf „Neuer Eintrag“ oder „Speichern“ legt den Abschnitt an Position 1 an.
 - Neuer Eintrag und Alt+N öffnen das Textfeld nicht. Man bleibt in der Liste und drückt Enter.
 - Automatisches Speichern ist still. Es steht nur in der Statuszeile.
